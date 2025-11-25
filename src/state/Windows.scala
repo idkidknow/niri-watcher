@@ -32,7 +32,7 @@ object Windows {
         case WindowOpenedOrChanged(window) =>
           val inserted = state.updated(window.id, window)
           val ret = if (window.isFocused) {
-            inserted.mapValues { w =>
+            inserted.view.mapValues { w =>
               w.copy(isFocused = w.id == window.id)
             }.toMap
           } else {
@@ -42,8 +42,8 @@ object Windows {
         case WindowClosed(id) =>
           UpdateResult.notify(state.removed(id))
         case WindowFocusChanged(id) =>
-          UpdateResult.notify(state.mapValues { w =>
-            w.copy(isFocused = Some(w.id) == id)
+          UpdateResult.notify(state.view.mapValues { w =>
+            w.copy(isFocused = id.contains(w.id))
           }.toMap)
         case WindowFocusTimestampChanged(id, focusTimestamp) =>
           UpdateResult.notify(
@@ -56,7 +56,7 @@ object Windows {
         case WindowLayoutsChanged(changes) =>
           val changesMap = changes.toMap
           UpdateResult.notify(
-            state.mapValues { w =>
+            state.view.mapValues { w =>
               changesMap.get(w.id) match {
                 case Some(layout) => w.copy(layout = layout)
                 case None => w

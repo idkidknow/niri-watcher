@@ -35,7 +35,7 @@ object Workspaces {
           )
         case WorkspaceActivated(id: ULong, focused: Boolean) =>
           val output = state(id).output
-          val updated = state.mapValues { w =>
+          val updated = state.view.mapValues { w =>
             val isCurr = w.id == id
             val ret = if (w.output == output) w.copy(isActive = isCurr) else w
             if (focused) {
