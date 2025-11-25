@@ -1,8 +1,10 @@
 package com.idkidknow.niriwatcher.state
 
+import cats.syntax.all.*
 import com.idkidknow.niriwatcher.event.Event
 import com.idkidknow.niriwatcher.event.Window
 import com.idkidknow.niriwatcher.state.Update.UpdateResult
+import com.idkidknow.niriwatcher.util.UnsignedInstances.given
 import io.circe.Encoder
 import monocle.syntax.all.*
 
@@ -33,7 +35,7 @@ object Windows {
           val inserted = state.updated(window.id, window)
           val ret = if (window.isFocused) {
             inserted.view.mapValues { w =>
-              w.copy(isFocused = w.id == window.id)
+              w.copy(isFocused = w.id === window.id)
             }.toMap
           } else {
             inserted

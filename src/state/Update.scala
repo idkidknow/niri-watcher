@@ -25,8 +25,7 @@ object Update {
   def apply[A: Update]: Update[A] = summon
 
   given monoidUpdate[A]: Monoid[Update[A]] = new Monoid {
-    override def empty: Update[A] = (state, event) =>
-      UpdateResult.dontNotify(state)
+    override def empty: Update[A] = (state, _) => UpdateResult.dontNotify(state)
     override def combine(x: Update[A], y: Update[A]): Update[A] =
       (state, event) => {
         val xRet = x.update(state, event)

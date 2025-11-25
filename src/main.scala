@@ -37,7 +37,7 @@ def eventStream[F[_]: {Network, Concurrent, Console}](
       io.circe.parser.decode[Event](s) match {
         case Left(e) =>
           Stream.exec(
-            Console[F].errorln(s"failed to parse the event: $s\nError: $e")
+            Console[F].errorln(show"failed to parse the event: $s\nError: $e")
           )
         case Right(event) => Stream.emit(event)
       }

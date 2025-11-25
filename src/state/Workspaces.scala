@@ -1,8 +1,10 @@
 package com.idkidknow.niriwatcher.state
 
+import cats.syntax.all.*
 import com.idkidknow.niriwatcher.event.Event
 import com.idkidknow.niriwatcher.event.Workspace
 import com.idkidknow.niriwatcher.state.Update.UpdateResult
+import com.idkidknow.niriwatcher.util.UnsignedInstances.given
 import io.circe.Encoder
 import monocle.syntax.all.*
 
@@ -36,8 +38,8 @@ object Workspaces {
         case WorkspaceActivated(id: ULong, focused: Boolean) =>
           val output = state(id).output
           val updated = state.view.mapValues { w =>
-            val isCurr = w.id == id
-            val ret = if (w.output == output) w.copy(isActive = isCurr) else w
+            val isCurr = w.id === id
+            val ret = if (w.output === output) w.copy(isActive = isCurr) else w
             if (focused) {
               ret.copy(isFocused = isCurr)
             } else ret

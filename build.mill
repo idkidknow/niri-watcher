@@ -21,7 +21,7 @@ object `package` extends ScalaNativeModule with ScalafixModule {
     mvn"com.monovore::decline::2.5.0",
   )
 
-  def scalacOptions = Seq("-Wunused:imports")
+  def scalacOptions = Seq("-Wunused:imports", "-Wall", "-deprecation")
 
   def nativeIncrementalCompilation = true
 

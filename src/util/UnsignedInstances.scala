@@ -1,5 +1,6 @@
 package com.idkidknow.niriwatcher.util
 
+import cats.kernel.Eq
 import io.circe.Codec
 import io.circe.Decoder
 import io.circe.Encoder
@@ -7,7 +8,7 @@ import io.circe.Encoder
 import scala.scalanative.meta.LinktimeInfo
 import scala.scalanative.unsigned.*
 
-object UnsignedCodecs {
+object UnsignedInstances {
   given u8Codec: Codec[UByte] = Codec.from(
     encodeA = Encoder[Short].contramap(n => n.toShort),
     decodeA = Decoder[Short].emap {
@@ -49,4 +50,10 @@ object UnsignedCodecs {
   } else {
     Codec.from(u64Codec.map(n => n.toUSize), u64Codec.contramap(n => n.toULong))
   }
+
+  given u8Eq: Eq[UByte] = Eq.fromUniversalEquals
+  given u16Eq: Eq[UShort] = Eq.fromUniversalEquals
+  given u32Eq: Eq[UInt] = Eq.fromUniversalEquals
+  given u64Eq: Eq[ULong] = Eq.fromUniversalEquals
+  given usizeEq: Eq[USize] = Eq.fromUniversalEquals
 }
