@@ -19,16 +19,17 @@ object Cli {
       }
   }
 
-  val view = Opts.argument[View](metavar = "view")
+  private val view = Opts.argument[View](metavar = "view")
 
-  val niriSocket = Opts.env[String](name = "NIRI_SOCKET", help = "NIRI_SOCKET")
+  private val niriSocket =
+    Opts.env[String](name = "NIRI_SOCKET", help = "NIRI_SOCKET")
 
   final case class Print(
       niriSocket: String,
       view: View,
   )
 
-  val printCommand =
+  private val printCommand =
     Command[Print](name = "print", header = "print states to stdout") {
       (niriSocket, view).mapN(Print.apply)
     }
@@ -41,11 +42,11 @@ object Cli {
       timeout: FiniteDuration,
   )
 
-  val exe = Opts.argument[String](metavar = "exe")
+  private val exe = Opts.argument[String](metavar = "exe")
 
-  val args = Opts.arguments[String](metavar = "args").orEmpty
+  private val args = Opts.arguments[String](metavar = "args").orEmpty
 
-  val timeout =
+  private val timeout =
     Opts
       .option[Int](
         long = "timeout",
@@ -55,7 +56,7 @@ object Cli {
       .withDefault(1000)
       .map(int => int.millis)
 
-  val watchCommand = Command[Watch](
+  private val watchCommand = Command[Watch](
     name = "watch",
     header =
       "run subprocess with environment variable STATE when the state changed",
@@ -63,7 +64,7 @@ object Cli {
     (niriSocket, view, exe, args, timeout).mapN(Watch.apply)
   }
 
-  val command = Command[Print | Watch](
+  val command: Command[Print | Watch] = Command(
     name = "niri-watcher",
     header = "restore states from niri event stream",
   ) {
