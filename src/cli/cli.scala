@@ -94,26 +94,21 @@ private val screenshot =
     }
   }
 
-private val printCommand =
-  Command(name = "print", header = "print states to stdout") {
-    Opts
-      .subcommands(
-        workspaces,
-        windows,
-        keyboardLayouts,
-        config,
-        overview,
-        screenshot,
-      )
-      .map { s =>
-        s.evalMap(line => IO.println(line)).compile.drain
-          *> ExitCode.Success.pure[IO]
-      }
-  }
-
 val command: Command[IO[ExitCode]] = Command(
   name = "niri-watcher",
   header = "restore states from niri event stream",
 ) {
-  Opts.subcommand(printCommand)
+  Opts
+    .subcommands(
+      workspaces,
+      windows,
+      keyboardLayouts,
+      config,
+      overview,
+      screenshot,
+    )
+    .map { s =>
+      s.evalMap(line => IO.println(line)).compile.drain
+        *> ExitCode.Success.pure[IO]
+    }
 }
