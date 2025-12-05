@@ -5,8 +5,6 @@ import cats.data.ValidatedNel
 import cats.syntax.all.*
 import com.monovore.decline.*
 
-import scala.concurrent.duration.*
-
 object Cli {
   type View = "workspaces" | "windows" | "keyboard_layouts" | "config" |
     "overview" | "screenshot"
@@ -34,40 +32,10 @@ object Cli {
       (niriSocket, view).mapN(Print.apply)
     }
 
-  final case class Watch(
-      niriSocket: String,
-      view: View,
-      exe: String,
-      args: List[String],
-      timeout: FiniteDuration,
-  )
-
-  private val exe = Opts.argument[String](metavar = "exe")
-
-  private val args = Opts.arguments[String](metavar = "args").orEmpty
-
-  private val timeout =
-    Opts
-      .option[Int](
-        long = "timeout",
-        help = "subprocess timeout (millis) [default: 1000]",
-        metavar = "millis",
-      )
-      .withDefault(1000)
-      .map(int => int.millis)
-
-  private val watchCommand = Command[Watch](
-    name = "watch",
-    header =
-      "run subprocess with environment variable STATE when the state changed",
-  ) {
-    (niriSocket, view, exe, args, timeout).mapN(Watch.apply)
-  }
-
-  val command: Command[Print | Watch] = Command(
+  val command: Command[Print] = Command(
     name = "niri-watcher",
     header = "restore states from niri event stream",
   ) {
-    Opts.subcommand(printCommand) orElse Opts.subcommand(watchCommand)
+    Opts.subcommand(printCommand)
   }
 }

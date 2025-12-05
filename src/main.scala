@@ -19,7 +19,6 @@ import com.idkidknow.niriwatcher.state.Windows
 import com.idkidknow.niriwatcher.state.Workspaces
 import fs2.Stream
 import fs2.io.net.Network
-import fs2.io.process.ProcessBuilder
 import io.circe.syntax.*
 
 def eventStream[F[_]: {Network, Concurrent, Console}](
@@ -87,24 +86,6 @@ object App extends IOApp {
         case Right(print: Cli.Print) =>
           stateStream(print.niriSocket, print.view)
             .evalMap(s => IO.println(s))
-            .compile
-            .drain *> ExitCode.Success.pure[IO]
-        case Right(watch: Cli.Watch) =>
-          stateStream(watch.niriSocket, watch.view)
-            .map { state =>
-              val subprocess =
-                ProcessBuilder(watch.exe, watch.args)
-                  .withExtraEnv(Map("STATE" -> state))
-                  .spawn[IO]
-                  .use { process =>
-                    val in = Stream.empty.through(process.stdin)
-                    val out = process.stdout.through(fs2.io.stdout)
-                    val err = process.stderr.through(fs2.io.stderr)
-                    Stream(in, out, err).parJoinUnbounded.compile.drain
-                  }
-              Stream.eval(subprocess).interruptAfter(watch.timeout)
-            }
-            .parJoinUnbounded
             .compile
             .drain *> ExitCode.Success.pure[IO]
       }
